@@ -51,21 +51,21 @@ public class Application {
 
 		return args -> {
 
+			var localSubagentTypes = ClaudeSubagentType.builder()
+				.skillsResources(skillPaths)
+				.chatClientBuilder("default",
+						chatClientBuilder.clone().defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
+				.braveApiKey(braveApiKey)
+				.build();
+
 			var taskTools = TaskTool.builder()
 				// Add Claude Subagent (local)
+				.subagentTypes(localSubagentTypes)
 				.subagentReferences(ClaudeSubagentReferences.fromResources(agentPaths))
-				.subagentTypes(ClaudeSubagentType.builder()
-					.skillsResources(skillPaths)
-					// configuration used by the local Claude subagents
-					.chatClientBuilder("default",
-							chatClientBuilder.clone().defaultAdvisors(new MyLoggingAdvisor(0, "[TASK]")))
-
-					.braveApiKey(braveApiKey)
-					.build())
 
 				// Add A2A Subagent (remote)
-				.subagentReferences(new SubagentReference("http://localhost:10001/airbnb", A2ASubagentDefinition.KIND))
 				.subagentTypes(new SubagentType(new A2ASubagentResolver(), new A2ASubagentExecutor()))
+				.subagentReferences(new SubagentReference("http://localhost:10001/airbnb", A2ASubagentDefinition.KIND))
 
 				.build();
 
@@ -77,30 +77,27 @@ public class Application {
 					.param(AgentEnvironment.AGENT_MODEL_KEY, agentModel)
 					.param(AgentEnvironment.AGENT_MODEL_KNOWLEDGE_CUTOFF_KEY, agentModelKnowledgeCutoff))
 
-				// sub-agent task tool callbacks
+				// Sub-agent task tool callbacks
 				.defaultToolCallbacks(taskTools)
 
-				// skills tool
+				// Agent Skills tool
 				.defaultToolCallbacks(SkillsTool.builder().addSkillsResources(skillPaths).build())
 				
 				.defaultTools(
-					// task orchestration tools
+					// Task orchestration tools
 					TodoWriteTool.builder().build(),
 
-					// common agentic tools
+					// Common agentic tools
 					GlobTool.builder().build(),
 					GrepTool.builder().build(),
 					ShellTools.builder().build(),
 					FileSystemTools.builder().build(),
-
 					SmartWebFetchTool.builder(chatClientBuilder.clone().build()).build(),
 					BraveWebSearchTool.builder(braveApiKey).resultCount(15).build())
 
 				// Advisors
 				.defaultAdvisors(
-					ToolCallAdvisor.builder()
-						.conversationHistoryEnabled(false)
-						.build(), // tool calling advisor
+					ToolCallAdvisor.builder().disableInternalConversationHistory().build(),
 
 					MessageChatMemoryAdvisor.builder(MessageWindowChatMemory.builder().maxMessages(500).build())
 						.order(Ordered.HIGHEST_PRECEDENCE + 1000)

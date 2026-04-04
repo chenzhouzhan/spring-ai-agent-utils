@@ -31,6 +31,12 @@
 		</dependency> -->
 
 		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<!-- <version>7.0.1</version> -->
+		</dependency>
+
+		<dependency>
 			<groupId>org.springaicommunity</groupId>
 			<artifactId>spring-ai-agent-utils</artifactId>
 			<version>0.6.0</version>
@@ -41,15 +47,15 @@
 			<artifactId>spring-ai-starter-model-anthropic</artifactId>
 		</dependency> -->
 
-		<!-- <dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-openai-sdk</artifactId>
-		</dependency> -->
-
 		<dependency>
 			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-google-genai</artifactId>
+			<artifactId>spring-ai-starter-model-openai-sdk</artifactId>
 		</dependency>
+
+		<!-- <dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-google-genai</artifactId>
+		</dependency> -->
 
 		<!-- Netty DNS resolver for macOS -->
 		<dependency>
